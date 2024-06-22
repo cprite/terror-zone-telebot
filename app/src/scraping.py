@@ -34,13 +34,4 @@ def get_terror_zone_info():
     zone_parts_current = [text.strip() for text in zone_parts_current]
     zone_parts_next = [text.strip() for text in zone_parts_next]
 
-
-    for zone in ZONES:
-        if zone == " ".join(zone_parts_current):
-            print(f"{zone} is a CURRENT terror zone")
-        elif zone == " ".join(zone_parts_next):
-            print(f"{zone} is a NEXT terror zone")
-
-
-
-get_terror_zone_info()
+    return zone_parts_current, zone_parts_next
