@@ -1,9 +1,8 @@
-import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from bs4 import BeautifulSoup
 
-from zones import ZONES
+from app.src.zones import ZONES
 
 
 def get_terror_zone_info():
