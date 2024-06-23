@@ -3,6 +3,8 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from bs4 import BeautifulSoup
 
 import time
+import os
+
 
 def terror_zone_loop():
 
@@ -14,7 +16,12 @@ def terror_zone_loop():
 
         if current_time.tm_min == 5 or first_run:
 
-            driver = webdriver.Chrome()
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--no-sandbox")
+
+            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
             driver.get("https://www.d2emu.com/tz")
 
