@@ -8,7 +8,7 @@ import time
 
 import app.keyboards as kb
 
-from app.src.scraping import get_terror_zone_info
+from app.src.zone_info import get_terror_zone_info
 from app.src.zones import ZONES
 
 router = Router()
@@ -45,7 +45,7 @@ async def back(call: CallbackQuery):
     global zone_choice_list
     looping = True
 
-    await call.message.edit_text("В процессе...")
+    await call.message.edit_text("В процессе...", reply_markup=kb.menu_button)
 
     while looping:
 
@@ -84,7 +84,7 @@ async def notifications(call: CallbackQuery):
 async def zone_choice(call: CallbackQuery):
     global zone_choice_list
 
-    terror_zone = ZONES[int(call.data.split("_")[1])]
+    terror_zone = ZONES[int(call.data.split("_")[1])].replace("🐮 ", "")
 
     if terror_zone in zone_choice_list:
         zone_choice_list.remove(terror_zone)
