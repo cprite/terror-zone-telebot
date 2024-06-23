@@ -10,30 +10,49 @@ import app.keyboards as kb
 
 from app.src.zone_info import get_terror_zone_info
 from app.src.zones import ZONES
+from app.ui.language import RUSSIAN, ENGLISH
 
 router = Router()
 
+# Global / default variables
 global looping
 global zone_choice_list
+global language
 looping = False
 zone_choice_list = []
+language = RUSSIAN
 
 
 """
 MAIN MENU HANDLERS / CALLBACKS
 """
 @router.message(CommandStart())
+@router.message(F.text == "Menu")
 @router.message(F.text == "Меню")
 async def cmd_start(message: Message):
     global looping
+    global language
     looping = False
-    await message.answer("Главное меню",
-                        reply_markup=kb.menu)
+    await message.answer(language["menu"][0],
+                        reply_markup=await kb.menu(language))
 
 @router.callback_query(F.data == "menu")
 async def menu(call: CallbackQuery):
-    await call.message.edit_text("Главное меню",
-                                reply_markup=kb.menu)
+    global language
+    await call.message.edit_text(language["menu"][0],
+                                reply_markup=await kb.menu(language))
+
+@router.callback_query(F.data == "language")
+async def language_selection(call: CallbackQuery):
+    global language
+
+    if language == RUSSIAN:
+        language = ENGLISH
+    else:
+        language = RUSSIAN
+
+    await call.message.edit_text(language["menu"][0],
+                                reply_markup=await kb.menu(language))
 
 
 """
@@ -43,9 +62,10 @@ MAIN POSTING LOOP CALLBACK
 async def back(call: CallbackQuery):
     global looping
     global zone_choice_list
+    global language
     looping = True
 
-    await call.message.edit_text("В процессе...", reply_markup=kb.menu_button)
+    await call.message.answer(language["main_loop"][0], reply_markup=await kb.menu_button(language))
 
     while looping:
 
@@ -65,9 +85,9 @@ async def back(call: CallbackQuery):
                     next_zone += "- " + zone_b + "\n"
 
                 if minutes == 45:
-                    await call.message.answer(f"!!!ВНИМАНИЕ!!!\n\nЧерез 15 мин начинается:\n{next_zone}")
+                    await call.message.answer(language["main_loop"][1] + "\n" + next_zone)
                 elif minutes == 0:
-                    await call.message.answer(f"!!!ВПЕРЕД!!!\n\nНачинается зона:\n{next_zone}")
+                    await call.message.answer(language["main_loop"][2] + "\n" + next_zone)
 
         await asyncio.sleep(60)
 
@@ -77,12 +97,15 @@ TERROR ZONE CHOICE CALLBACKS
 """
 @router.callback_query(F.data == "terror_zone_choice")
 async def notifications(call: CallbackQuery):
-    await call.message.edit_text("Выберите нужные террор-зоны для уведомлений:",
-                            reply_markup=await kb.zone_choice())
+    global zone_choice_list
+    global language
+    await call.message.edit_text(language["zone_choice"][0],
+                            reply_markup=await kb.zone_choice(language, zone_choice_list))
 
 @router.callback_query(F.data.startswith("zone_"))
 async def zone_choice(call: CallbackQuery):
     global zone_choice_list
+    global language
 
     terror_zone = ZONES[int(call.data.split("_")[1])].replace("🐮 ", "")
 
@@ -91,5 +114,5 @@ async def zone_choice(call: CallbackQuery):
     else:
         zone_choice_list.append(terror_zone)
 
-    await call.message.edit_text("Выберите нужные террор-зоны для уведомлений:",
-                            reply_markup=await kb.zone_choice(zone_choice_list))
+    await call.message.edit_text(language["zone_choice"][0],
+                            reply_markup=await kb.zone_choice(language, zone_choice_list))
