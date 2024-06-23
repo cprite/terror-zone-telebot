@@ -6,26 +6,36 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from app.src.zones import ZONES
 
 
-menu = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Старт", callback_data="start")],
-     [InlineKeyboardButton(text="Выбор зоны", callback_data="terror_zone_choice")]
-])
+"""
+MAIN MENU KEYBOARDS
+"""
+async def menu(language):
+    menu_keyboard = InlineKeyboardBuilder()
+    menu_keyboard.add(InlineKeyboardButton(text=language['menu'][1], callback_data="start"))
+    menu_keyboard.add(InlineKeyboardButton(text=language['menu'][2], callback_data="terror_zone_choice"))
+    menu_keyboard.add(InlineKeyboardButton(text=language['menu'][4], callback_data="language"))
 
-menu_button = ReplyKeyboardMarkup(keyboard=[
-    [
-        KeyboardButton(text="Меню")
-    ]
-], resize_keyboard=True)
+    return menu_keyboard.as_markup()
 
-async def zone_choice(zone_choice_list=[]):
+async def menu_button(language):
+    menu_button_markup = ReplyKeyboardBuilder()
+    menu_button_markup.add(KeyboardButton(text=language['menu'][3]))
+
+    return menu_button_markup.as_markup()
+
+
+"""
+ZONE CHOICE KEYBOARDS
+"""
+async def zone_choice(language, zone_choice_list=[]):
     keyboard = InlineKeyboardBuilder()
 
     for index, zone in ZONES.items():
-        if zone in zone_choice_list:
+        if zone.replace("🐮 ", "") in zone_choice_list:
             keyboard.add(InlineKeyboardButton(text=f"✅ {zone}", callback_data=f"zone_{str(index)}"))
         else:
             keyboard.add(InlineKeyboardButton(text=zone, callback_data=f"zone_{str(index)}"))
 
-    keyboard.add(InlineKeyboardButton(text="Готово", callback_data="menu"))
+    keyboard.add(InlineKeyboardButton(text=language["zone_choice"][1], callback_data="menu"))
 
     return keyboard.adjust(3).as_markup()
