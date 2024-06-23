@@ -11,7 +11,7 @@ ZONES = {
     10: 'Pit',
     11: 'Tristram',
     12: '🐮 Moo Moo Farm',
-    13: 'Sewers',
+    13: 'Lut Gholein Sewers',
     14: 'Stony Tomb Rocky Waste',
     15: 'Dry Hills Halls of the Dead',
     16: 'Far Oasis',
