@@ -11,6 +11,12 @@ menu = InlineKeyboardMarkup(inline_keyboard=[
      [InlineKeyboardButton(text="Выбор зоны", callback_data="terror_zone_choice")]
 ])
 
+menu_button = ReplyKeyboardMarkup(keyboard=[
+    [
+        KeyboardButton(text="Меню")
+    ]
+], resize_keyboard=True)
+
 async def zone_choice(zone_choice_list=[]):
     keyboard = InlineKeyboardBuilder()
 
