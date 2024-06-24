@@ -6,6 +6,7 @@ import chromedriver_autoinstaller
 import time
 import os
 
+""""""
 
 def terror_zone_loop():
 
@@ -21,11 +22,13 @@ def terror_zone_loop():
 
             chrome_options = webdriver.ChromeOptions()
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            print("____________________________________10")
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
 
             service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+            print("____________________________________11")
 
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
