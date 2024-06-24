@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 
-import chromedriver_autoinstaller
 import time
 import os
 
@@ -18,8 +17,6 @@ def terror_zone_loop():
 
         if current_time.tm_min == 5 or first_run:
 
-            chromedriver_autoinstaller.install()
-
             chrome_options = webdriver.ChromeOptions()
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
             print("____________________________________10")
@@ -32,7 +29,11 @@ def terror_zone_loop():
 
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
+            print("____________________________________12")
+
             driver.get("https://www.d2emu.com/tz")
+
+            print("____________________________________13")
 
             page_source = driver.page_source
 
