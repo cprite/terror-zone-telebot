@@ -13,15 +13,9 @@ async def menu(language):
     menu_keyboard = InlineKeyboardBuilder()
     menu_keyboard.add(InlineKeyboardButton(text=language['menu'][1], callback_data="start"))
     menu_keyboard.add(InlineKeyboardButton(text=language['menu'][2], callback_data="terror_zone_choice"))
-    menu_keyboard.add(InlineKeyboardButton(text=language['menu'][4], callback_data="language"))
+    menu_keyboard.add(InlineKeyboardButton(text=language['menu'][3], callback_data="language"))
 
-    return menu_keyboard.as_markup()
-
-async def menu_button(language):
-    menu_button_markup = ReplyKeyboardBuilder()
-    menu_button_markup.add(KeyboardButton(text=language['menu'][3]))
-
-    return menu_button_markup.as_markup()
+    return menu_keyboard.adjust(1).as_markup()
 
 
 """

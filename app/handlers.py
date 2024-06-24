@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.filters import CommandStart
+from aiogram.filters.command import Command
 from aiogram.types import Message, CallbackQuery
-from aiogram.methods.delete_message import DeleteMessage
 
 import asyncio
 import time
@@ -20,15 +20,14 @@ global zone_choice_list
 global language
 looping = False
 zone_choice_list = []
-language = RUSSIAN
+language = ENGLISH
 
 
 """
 MAIN MENU HANDLERS / CALLBACKS
 """
 @router.message(CommandStart())
-@router.message(F.text == "Menu")
-@router.message(F.text == "Меню")
+@router.message(Command("menu"))
 async def cmd_start(message: Message):
     global looping
     global language
@@ -37,10 +36,12 @@ async def cmd_start(message: Message):
                         reply_markup=await kb.menu(language))
 
 @router.callback_query(F.data == "menu")
-async def menu(call: CallbackQuery):
+async def cmd_start(call: CallbackQuery):
+    global looping
     global language
+    looping = False
     await call.message.edit_text(language["menu"][0],
-                                reply_markup=await kb.menu(language))
+                        reply_markup=await kb.menu(language))
 
 @router.callback_query(F.data == "language")
 async def language_selection(call: CallbackQuery):
@@ -54,6 +55,10 @@ async def language_selection(call: CallbackQuery):
     await call.message.edit_text(language["menu"][0],
                                 reply_markup=await kb.menu(language))
 
+def get_language():
+    global language
+    return language
+
 
 """
 MAIN POSTING LOOP CALLBACK
@@ -65,7 +70,8 @@ async def back(call: CallbackQuery):
     global language
     looping = True
 
-    await call.message.answer(language["main_loop"][0], reply_markup=await kb.menu_button(language))
+    await call.message.edit_text(language["main_loop"][0])
+    print("Looping started")
 
     while looping:
 
