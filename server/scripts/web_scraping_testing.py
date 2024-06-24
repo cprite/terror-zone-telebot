@@ -18,17 +18,7 @@ def terror_zone_loop():
 
         if current_time.tm_min == 5 or first_run:
 
-            chrome_options = webdriver.ChromeOptions()
-            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-            chrome_options.add_argument("start-maximized")
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--no-sandbox")
-
-            # service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
-
-            # driver = webdriver.Chrome(service=service, options=chrome_options)
-            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+            driver = webdriver.Chrome()
 
             driver.get("https://www.d2emu.com/tz")
 
@@ -55,7 +45,7 @@ def terror_zone_loop():
             # zone_parts_current = [text.strip() for text in zone_parts_current]
             zone_parts_next = [text.strip() for text in zone_parts_next]
 
-            with open(os.path.join("server/data", "next_zone.txt"), "w") as file:
+            with open("../data/next_zone.txt", "w") as file:
                 for part in zone_parts_next:
                     file.write(part + "\n")
 

@@ -2,7 +2,6 @@ RUSSIAN = {
     "menu": ["Главное меню",
              "Старт",
              "Выбор зоны",
-             "Меню",
              "🇷🇺"],
 
     "zone_choice": ["Выберите нужные террор-зоны для уведомлений:",
@@ -16,8 +15,7 @@ RUSSIAN = {
 ENGLISH = {
     "menu": ["Main menu",
              "Start",
-             "Zone choice",
-             "Menu",
+             "Pick zone",
              "🇬🇧"],
 
     "zone_choice": ["Choose the necessary terror zones for notifications:",
