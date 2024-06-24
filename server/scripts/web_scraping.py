@@ -61,7 +61,7 @@ def terror_zone_loop():
             # zone_parts_current = [text.strip() for text in zone_parts_current]
             zone_parts_next = [text.strip() for text in zone_parts_next]
 
-            with open(os.path.join("data", "next_zone.txt"), "w") as file:
+            with open(os.path.join("server/data", "next_zone.txt"), "w") as file:
                 for part in zone_parts_next:
                     file.write(part + "\n")
 
