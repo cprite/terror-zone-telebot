@@ -46,8 +46,6 @@ def terror_zone_loop():
 
             span = soup.find_all("span", {"class": "terrorzone darkmode-ignore"})
 
-            print(span)
-
             # current = span[0]
             next = span[1]
 
@@ -63,9 +61,11 @@ def terror_zone_loop():
             # zone_parts_current = [text.strip() for text in zone_parts_current]
             zone_parts_next = [text.strip() for text in zone_parts_next]
 
-            with open("../data/next_zone.txt", "w") as file:
+            with open(os.path.join("data", "next_zone.txt"), "w") as file:
                 for part in zone_parts_next:
                     file.write(part + "\n")
+
+            print("Zone updated")
 
             first_run = False
 
