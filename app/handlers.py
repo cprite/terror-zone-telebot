@@ -55,10 +55,6 @@ async def language_selection(call: CallbackQuery):
     await call.message.edit_text(language["menu"][0],
                                 reply_markup=await kb.menu(language))
 
-def get_language():
-    global language
-    return language
-
 
 """
 MAIN POSTING LOOP CALLBACK
