@@ -27,7 +27,7 @@ language = ENGLISH
 MAIN MENU HANDLERS / CALLBACKS
 """
 @router.message(CommandStart())
-@router.message(Command("menu"))
+@router.message(Command("stop"))
 async def cmd_start(message: Message):
     global looping
     global language
@@ -95,7 +95,7 @@ async def back(call: CallbackQuery):
                 elif minutes == 0:
                     await call.message.answer(language["main_loop"][2] + "\n" + next_zone)
 
-        await asyncio.sleep(60)
+        await asyncio.sleep(0.1)
 
 
 """
