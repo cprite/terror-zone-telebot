@@ -90,6 +90,7 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         current_time = time.localtime()
         minutes = current_time.tm_min
+        seconds = current_time.tm_sec
 
         if minutes == 45 or minutes == 0:
 
@@ -103,15 +104,15 @@ async def back(call: CallbackQuery, state: FSMContext):
                 for zone_b in next_parts:
                     next_zone += "- " + zone_b + "\n"
 
-                if minutes == 45:
+                if minutes == 45 and seconds == 0:
                     await call.message.answer(language["main_loop"][1] + "\n" + next_zone)
-                elif minutes == 0:
+                elif minutes == 0 and seconds == 0:
                     await call.message.answer(language["main_loop"][2] + "\n" + next_zone)
 
         data = await state.get_data()
         looping = data["looping"]
 
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(1)
 
 
 """
