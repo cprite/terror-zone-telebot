@@ -80,9 +80,8 @@ async def back(call: CallbackQuery, state: FSMContext):
 
     zone_choice_list = data["zone_choice_list"]
     language = data["language"]
-    looping = data["looping"]
-
     await state.update_data(looping=True)
+    looping = data["looping"]
 
     await call.message.edit_text(language["main_loop"][0])
     print("Looping started")
