@@ -84,7 +84,6 @@ async def back(call: CallbackQuery, state: FSMContext):
     looping = data["looping"]
 
     await call.message.edit_text(language["main_loop"][0])
-    print("Looping started")
 
     while looping:
 
@@ -110,6 +109,7 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         data = await state.get_data()
         looping = data["looping"]
+        print("loop")
 
         await asyncio.sleep(0.1)
 
