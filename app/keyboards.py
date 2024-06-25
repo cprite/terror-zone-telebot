@@ -21,7 +21,7 @@ async def menu(language):
 """
 ZONE CHOICE KEYBOARDS
 """
-async def zone_choice(language, zone_choice_list=[]):
+async def zone_choice(language, zone_choice_list):
     keyboard = InlineKeyboardBuilder()
 
     for index, zone in ZONES.items():
