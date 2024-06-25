@@ -76,11 +76,12 @@ MAIN POSTING LOOP CALLBACK
 """
 @router.callback_query(F.data == "start")
 async def back(call: CallbackQuery, state: FSMContext):
+    await state.update_data(looping=True)
+
     data = await state.get_data()
 
     zone_choice_list = data["zone_choice_list"]
     language = data["language"]
-    await state.update_data(looping=True)
     looping = data["looping"]
 
     await call.message.edit_text(language["main_loop"][0])
@@ -109,7 +110,6 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         data = await state.get_data()
         looping = data["looping"]
-        print("loop")
 
         await asyncio.sleep(0.1)
 
@@ -140,6 +140,8 @@ async def zone_choice(call: CallbackQuery, state: FSMContext):
         zone_choice_list.append(terror_zone)
 
     await state.update_data(zone_choice_list=zone_choice_list)
+    data = await state.get_data()
+    zone_choice_list = data["zone_choice_list"]
 
     await call.message.edit_text(language["zone_choice"][0],
                             reply_markup=await kb.zone_choice(language, zone_choice_list))
