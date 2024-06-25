@@ -2,6 +2,8 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
 from aiogram.types import Message, CallbackQuery
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 
 import asyncio
 import time
@@ -14,43 +16,56 @@ from app.ui.language import RUSSIAN, ENGLISH
 
 router = Router()
 
-# Global / default variables
-global looping
-global zone_choice_list
-global language
-looping = False
-zone_choice_list = []
-language = ENGLISH
-
 
 """
 MAIN MENU HANDLERS / CALLBACKS
 """
+
+class GlobalVars(StatesGroup):
+    looping = State()
+    zone_choice_list = State()
+    language = State()
+
 @router.message(CommandStart())
+async def cmd_start(message: Message, state: FSMContext):
+    await state.update_data(looping=False, zone_choice_list=[], language=ENGLISH)
+
+    data = await state.get_data()
+    language = data["language"]
+
+    await message.answer(language["menu"][0],
+                        reply_markup=await kb.menu(language))
+
 @router.message(Command("stop"))
-async def cmd_start(message: Message):
-    global looping
-    global language
-    looping = False
+async def cmd_start(message: Message, state: FSMContext):
+    await state.update_data(looping=False)
+    data = await state.get_data()
+    language = data["language"]
+
     await message.answer(language["menu"][0],
                         reply_markup=await kb.menu(language))
 
 @router.callback_query(F.data == "menu")
-async def cmd_start(call: CallbackQuery):
-    global looping
-    global language
-    looping = False
+async def cmd_start(call: CallbackQuery, state: FSMContext):
+    await state.update_data(looping=False)
+    data = await state.get_data()
+    language = data["language"]
+
     await call.message.edit_text(language["menu"][0],
                         reply_markup=await kb.menu(language))
 
 @router.callback_query(F.data == "language")
-async def language_selection(call: CallbackQuery):
-    global language
+async def language_selection(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
 
     if language == RUSSIAN:
-        language = ENGLISH
+        await state.update_data(language=ENGLISH)
     else:
-        language = RUSSIAN
+        await state.update_data(language=RUSSIAN)
+
+    data = await state.get_data()
+    language = data["language"]
 
     await call.message.edit_text(language["menu"][0],
                                 reply_markup=await kb.menu(language))
@@ -60,11 +75,14 @@ async def language_selection(call: CallbackQuery):
 MAIN POSTING LOOP CALLBACK
 """
 @router.callback_query(F.data == "start")
-async def back(call: CallbackQuery):
-    global looping
-    global zone_choice_list
-    global language
-    looping = True
+async def back(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+
+    zone_choice_list = data["zone_choice_list"]
+    language = data["language"]
+    looping = data["looping"]
+
+    await state.update_data(looping=True)
 
     await call.message.edit_text(language["main_loop"][0])
     print("Looping started")
@@ -91,6 +109,9 @@ async def back(call: CallbackQuery):
                 elif minutes == 0:
                     await call.message.answer(language["main_loop"][2] + "\n" + next_zone)
 
+        data = await state.get_data()
+        looping = data["looping"]
+
         await asyncio.sleep(0.1)
 
 
@@ -98,16 +119,19 @@ async def back(call: CallbackQuery):
 TERROR ZONE CHOICE CALLBACKS
 """
 @router.callback_query(F.data == "terror_zone_choice")
-async def notifications(call: CallbackQuery):
-    global zone_choice_list
-    global language
+async def notifications(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
+    zone_choice_list = data["zone_choice_list"]
+
     await call.message.edit_text(language["zone_choice"][0],
                             reply_markup=await kb.zone_choice(language, zone_choice_list))
 
 @router.callback_query(F.data.startswith("zone_"))
-async def zone_choice(call: CallbackQuery):
-    global zone_choice_list
-    global language
+async def zone_choice(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
+    zone_choice_list = data["zone_choice_list"]
 
     terror_zone = ZONES[int(call.data.split("_")[1])].replace("🐮 ", "")
 
@@ -115,6 +139,8 @@ async def zone_choice(call: CallbackQuery):
         zone_choice_list.remove(terror_zone)
     else:
         zone_choice_list.append(terror_zone)
+
+    await state.update_data(zone_choice_list=zone_choice_list)
 
     await call.message.edit_text(language["zone_choice"][0],
                             reply_markup=await kb.zone_choice(language, zone_choice_list))
