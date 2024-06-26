@@ -30,23 +30,27 @@ def terror_zone_loop():
 
             span = soup.find_all("span", {"class": "terrorzone darkmode-ignore"})
 
-            # current = span[0]
+            current = span[0]
             next = span[1]
 
             # Extract the raw HTML content inside the span
-            # raw_html_current = current.decode_contents()
+            raw_html_current = current.decode_contents()
             raw_html_next = next.decode_contents()
 
             # Split the content by <br/> tags
-            # zone_parts_current = raw_html_current.split('<br/>')
+            zone_parts_current = raw_html_current.split('<br/>')
             zone_parts_next = raw_html_next.split('<br/>')
 
             # Remove any surrounding whitespace
-            # zone_parts_current = [text.strip() for text in zone_parts_current]
+            zone_parts_current = [text.strip() for text in zone_parts_current]
             zone_parts_next = [text.strip() for text in zone_parts_next]
 
             with open("../data/next_zone.txt", "w") as file:
                 for part in zone_parts_next:
+                    file.write(part + "\n")
+
+            with open("../data/current_zone.txt", "w") as file:
+                for part in zone_parts_current:
                     file.write(part + "\n")
 
             print("Zone updated")
