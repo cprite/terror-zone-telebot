@@ -10,7 +10,7 @@ import time
 
 import app.keyboards as kb
 
-from app.src.zone_info import get_terror_zone_info
+from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH
 
@@ -36,7 +36,7 @@ async def cmd_start(message: Message, state: FSMContext):
     await message.answer(language["menu"][0],
                         reply_markup=await kb.menu(language))
 
-@router.message(Command("stop"))
+@router.message(Command("menu"))
 async def cmd_start(message: Message, state: FSMContext):
     await state.update_data(looping=False)
     data = await state.get_data()
@@ -70,6 +70,21 @@ async def language_selection(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(language["menu"][0],
                                 reply_markup=await kb.menu(language))
 
+@router.callback_query(F.data == "current_zone")
+async def current_zone(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
+
+    current_parts = get_current_terror_zone()
+
+    current_zone = ""
+
+    for i in current_parts:
+        current_zone += "- " + i + "\n"
+
+    await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
+                                 reply_markup=await kb.back(language))
+
 
 """
 MAIN POSTING LOOP CALLBACK
@@ -94,7 +109,7 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         if minutes == 45 or minutes == 0:
 
-            next_parts = get_terror_zone_info()
+            next_parts = get_next_terror_zone()
             next = " ".join(next_parts)
 
             if next in zone_choice_list or not zone_choice_list:
