@@ -40,6 +40,8 @@ def terror_zone_loop():
 
             span = soup.find_all("span", {"class": "terrorzone darkmode-ignore"})
 
+            print(span)
+
             current = span[0]
             next = span[1]
 
