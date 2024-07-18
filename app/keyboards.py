@@ -33,8 +33,9 @@ async def admin_panel(maintenance_status):
     admin_panel_keyboard.add(InlineKeyboardButton(text=f"Тех. работы: {maintenance_status}", callback_data="tech_maintenance"))
     admin_panel_keyboard.add(InlineKeyboardButton(text=f"Интеграция", callback_data="ads"))
     admin_panel_keyboard.add(InlineKeyboardButton(text=f"Статистика", callback_data="stats"))
+    admin_panel_keyboard.add(InlineKeyboardButton(text=f"Назад", callback_data="back"))
 
-    return admin_panel_keyboard.adjust(1).as_markup()
+    return admin_panel_keyboard.adjust(2).as_markup()
 
 
 """
