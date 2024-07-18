@@ -12,7 +12,7 @@ import app.keyboards as kb
 
 from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
-from app.ui.language import RUSSIAN, ENGLISH
+from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
 from app.database.csv.users import add_new_user, get_users, delete_user
 
 router = Router()
@@ -67,16 +67,30 @@ async def language_selection(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     language = data["language"]
 
-    if language == RUSSIAN:
-        await state.update_data(language=ENGLISH)
-    else:
+    await call.message.edit_text(language["menu"][7],
+                                reply_markup=await kb.language_choice(language))
+
+@router.callback_query(F.data.startswith("language_"))
+async def set_language(call: CallbackQuery, state: FSMContext):
+    language = call.data.split("_")[1]
+
+    if language == "ru":
         await state.update_data(language=RUSSIAN)
+    elif language == "en":
+        await state.update_data(language=ENGLISH)
+    elif language == "uk":
+        await state.update_data(language=UKRAINIAN)
+    elif language == "zh":
+        await state.update_data(language=CHINESE)
+    elif language == "pt":
+        await state.update_data(language=PORTUGUESE)
+    elif language == "de":
+        await state.update_data(language=GERMAN)
 
     data = await state.get_data()
-    language = data["language"]
 
-    await call.message.edit_text(language["menu"][0],
-                                reply_markup=await kb.menu(language, call.from_user.id))
+    await call.message.edit_text(data["language"]["menu"][0],
+                                reply_markup=await kb.menu(data["language"], call.from_user.id))
 
 @router.callback_query(F.data == "current_zone")
 async def current_zone(call: CallbackQuery, state: FSMContext):
