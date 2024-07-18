@@ -13,6 +13,7 @@ import app.keyboards as kb
 from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH
+from app.database.csv.users import add_new_user, get_users, delete_user
 
 router = Router()
 
@@ -28,9 +29,13 @@ class GlobalVars(StatesGroup):
     looping = State()
     zone_choice_list = State()
     language = State()
+    announcement = State()
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext):
+
+    add_new_user(message.from_user.id)
+
     await state.update_data(looping=False, zone_choice_list=[], language=ENGLISH)
 
     data = await state.get_data()
@@ -94,6 +99,33 @@ async def admin_mode(call: CallbackQuery):
 
     await call.message.edit_text("Панель админа", reply_markup=await kb.admin_panel(maintenance_status))
 
+@router.callback_query(F.data == "announcement")
+async def set_announcement(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
+
+    await state.set_state(GlobalVars.announcement)
+
+    await call.message.edit_text("Введите объявление:", reply_markup=await kb.back(language))
+
+@router.message(GlobalVars.announcement)
+async def send_announcement(message: Message, state: FSMContext):
+    await state.update_data(announcement=message.text)
+    users = get_users()
+
+    data = await state.get_data()
+    language = data["language"]
+    announcement = data["announcement"]
+
+    for user in users:
+        try:
+            await message.bot.send_message(user, announcement)
+        except:
+            delete_user(user)
+
+    await message.answer(language["menu"][0],
+                                reply_markup=await kb.menu(language, message.from_user.id))
+
 
 """
 MAIN POSTING LOOP CALLBACK
@@ -129,9 +161,9 @@ async def back(call: CallbackQuery, state: FSMContext):
                     next_zone += "- " + zone_b + "\n"
 
                 if minutes == 45 and seconds == 0:
-                    await call.message.answer(language["main_loop"][1] + "\n" + next_zone)
+                    await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
                 elif minutes == 0 and seconds == 0:
-                    await call.message.answer(language["main_loop"][2] + "\n" + next_zone)
+                    await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
 
         data = await state.get_data()
         looping = data["looping"]
