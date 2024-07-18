@@ -9,7 +9,7 @@ from app.handlers import router # обработка запросов через
 
 
 load_dotenv()
-bot = Bot(token=os.getenv('TOKEN'))
+bot = Bot(token=os.getenv('TOKEN_TEST'))
 dp = Dispatcher()
 
 async def main():
