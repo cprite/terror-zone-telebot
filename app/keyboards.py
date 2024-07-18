@@ -37,6 +37,19 @@ async def admin_panel(maintenance_status):
 
     return admin_panel_keyboard.adjust(2).as_markup()
 
+async def language_choice(language):
+    language_keyboard = InlineKeyboardBuilder()
+    language_keyboard.add(InlineKeyboardButton(text="🇷🇺", callback_data="language_ru"))
+    language_keyboard.add(InlineKeyboardButton(text="🇬🇧", callback_data="language_en"))
+    language_keyboard.add(InlineKeyboardButton(text="🇺🇦", callback_data="language_uk"))
+    language_keyboard.add(InlineKeyboardButton(text="🇨🇳", callback_data="language_zh"))
+    language_keyboard.add(InlineKeyboardButton(text="🇧🇷", callback_data="language_pt"))
+    language_keyboard.add(InlineKeyboardButton(text="🇩🇪", callback_data="language_de"))
+
+    language_keyboard.add(InlineKeyboardButton(text=language['menu'][6], callback_data="menu"))
+
+    return language_keyboard.adjust(2).as_markup()
+
 
 """
 ZONE CHOICE KEYBOARDS
