@@ -10,7 +10,7 @@ def add_new_user(id):
 
         df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
 
-        df = df.concat([df, pd.DataFrame({"user": [id]})], ignore_index=True)
+        df = df._append(pd.DataFrame({"user": [id]}), ignore_index=True)
 
         df.to_csv(os.path.join("app/database/csv", "users.csv"), index=False)
 
