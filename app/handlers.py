@@ -92,7 +92,7 @@ async def current_zone(call: CallbackQuery, state: FSMContext):
 async def admin_mode(call: CallbackQuery):
     global maintenance_status
 
-    await call.message.edit_text("Admin panel", reply_markup=await kb.admin_panel(maintenance_status))
+    await call.message.edit_text("Панель админа", reply_markup=await kb.admin_panel(maintenance_status))
 
 
 """
