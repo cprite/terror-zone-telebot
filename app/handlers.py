@@ -16,6 +16,9 @@ from app.ui.language import RUSSIAN, ENGLISH
 
 router = Router()
 
+global maintenance_status
+maintenance_status = "OFF"
+
 
 """
 MAIN MENU HANDLERS / CALLBACKS
@@ -34,7 +37,7 @@ async def cmd_start(message: Message, state: FSMContext):
     language = data["language"]
 
     await message.answer(language["menu"][0],
-                        reply_markup=await kb.menu(language))
+                        reply_markup=await kb.menu(language, message.from_user.id))
 
 @router.message(Command("menu"))
 async def cmd_start(message: Message, state: FSMContext):
@@ -43,7 +46,7 @@ async def cmd_start(message: Message, state: FSMContext):
     language = data["language"]
 
     await message.answer(language["menu"][0],
-                        reply_markup=await kb.menu(language))
+                        reply_markup=await kb.menu(language, message.from_user.id))
 
 @router.callback_query(F.data == "menu")
 async def cmd_start(call: CallbackQuery, state: FSMContext):
@@ -52,7 +55,7 @@ async def cmd_start(call: CallbackQuery, state: FSMContext):
     language = data["language"]
 
     await call.message.edit_text(language["menu"][0],
-                        reply_markup=await kb.menu(language))
+                        reply_markup=await kb.menu(language, call.from_user.id))
 
 @router.callback_query(F.data == "language")
 async def language_selection(call: CallbackQuery, state: FSMContext):
@@ -68,7 +71,7 @@ async def language_selection(call: CallbackQuery, state: FSMContext):
     language = data["language"]
 
     await call.message.edit_text(language["menu"][0],
-                                reply_markup=await kb.menu(language))
+                                reply_markup=await kb.menu(language, call.from_user.id))
 
 @router.callback_query(F.data == "current_zone")
 async def current_zone(call: CallbackQuery, state: FSMContext):
@@ -84,6 +87,12 @@ async def current_zone(call: CallbackQuery, state: FSMContext):
 
     await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
                                  reply_markup=await kb.back(language))
+
+@router.callback_query(F.data == "admin")
+async def admin_mode(call: CallbackQuery):
+    global maintenance_status
+
+    await call.message.edit_text("Admin panel", reply_markup=await kb.admin_panel(maintenance_status))
 
 
 """
