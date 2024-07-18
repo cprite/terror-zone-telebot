@@ -16,7 +16,7 @@ async def menu(language, user_id):
     menu_keyboard.add(InlineKeyboardButton(text=language['menu'][3], callback_data="current_zone"))
     menu_keyboard.add(InlineKeyboardButton(text=language['menu'][4], callback_data="language"))
 
-    if user_id == 0:
+    if user_id == 0 or user_id == 0:
         menu_keyboard.add(InlineKeyboardButton(text="Панель админа", callback_data="admin"))
 
     return menu_keyboard.adjust(2).as_markup()
