@@ -252,9 +252,9 @@ async def back(call: CallbackQuery, state: FSMContext):
                         next_zone += "- " + zone_b + "\n"
 
                     if minutes == 45 and seconds == 0:
-                        await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+                        await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot")
                     elif minutes == 0 and seconds == 0:
-                        await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+                        await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot")
 
             if maintenance_status == "ON":
                 await call.message.edit_text("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
