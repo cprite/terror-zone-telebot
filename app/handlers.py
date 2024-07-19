@@ -13,7 +13,7 @@ import app.keyboards as kb
 from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
-from app.database.csv.users import add_new_user, get_users, delete_user
+from app.database.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_stats
 
 router = Router()
 
@@ -49,6 +49,12 @@ async def cmd_start(message: Message, state: FSMContext):
     await state.update_data(looping=False)
     data = await state.get_data()
     language = data["language"]
+    zone_choice_list = data["zone_choice_list"]
+    zone_count = len(zone_choice_list)
+
+    switch_looping(message.from_user.id)
+    if zone_count == 0 or zone_count == 36:
+        switch_all_zones(message.from_user.id)
 
     await message.answer(language["menu"][0],
                         reply_markup=await kb.menu(language, message.from_user.id))
@@ -107,6 +113,11 @@ async def current_zone(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
                                  reply_markup=await kb.back(language))
 
+
+"""
+ADMIN PANEL HANDLERS / CALLBACKS
+"""
+
 @router.callback_query(F.data == "admin")
 async def admin_mode(call: CallbackQuery):
     global maintenance_status
@@ -140,6 +151,18 @@ async def send_announcement(message: Message, state: FSMContext):
     await message.answer(language["menu"][0],
                                 reply_markup=await kb.menu(language, message.from_user.id))
 
+@router.callback_query(F.data == "stats")
+async def user_stats(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    language = data["language"]
+
+    user_count = len(get_users())
+    stats = get_stats()
+
+    await call.message.edit_text(f"Общее кол-во пользователей: {user_count}\n\nАктивная рассылка: {stats[0]}\n\nВыбраны все зоны: {stats[1]}",
+                                 reply_markup=await kb.back(language))
+
+
 
 """
 MAIN POSTING LOOP CALLBACK
@@ -151,8 +174,13 @@ async def back(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
 
     zone_choice_list = data["zone_choice_list"]
+    zone_count = len(zone_choice_list)
     language = data["language"]
     looping = data["looping"]
+
+    switch_looping(call.from_user.id)
+    if zone_count == 0 or zone_count == 36:
+        switch_all_zones(call.from_user.id)
 
     await call.message.edit_text(language["main_loop"][0])
 
@@ -188,6 +216,7 @@ async def back(call: CallbackQuery, state: FSMContext):
 """
 TERROR ZONE CHOICE CALLBACKS
 """
+
 @router.callback_query(F.data == "terror_zone_choice")
 async def notifications(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
