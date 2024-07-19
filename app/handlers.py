@@ -13,6 +13,7 @@ import app.keyboards as kb
 from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
+from app.admin.admin_list import ADMINS
 from app.admin.stats.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_stats
 
 router = Router()
@@ -35,7 +36,7 @@ class GlobalVars(StatesGroup):
 async def cmd_start(message: Message, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or message.from_user.id in ADMINS:
 
         add_new_user(message.from_user.id)
 
@@ -53,7 +54,7 @@ async def cmd_start(message: Message, state: FSMContext):
 async def cmd_start(message: Message, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or message.from_user.id in ADMINS:
 
         await state.update_data(looping=False)
         data = await state.get_data()
@@ -74,7 +75,7 @@ async def cmd_start(message: Message, state: FSMContext):
 async def cmd_start(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         await state.update_data(looping=False)
         data = await state.get_data()
@@ -89,7 +90,7 @@ async def cmd_start(call: CallbackQuery, state: FSMContext):
 async def language_selection(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         data = await state.get_data()
         language = data["language"]
@@ -103,7 +104,7 @@ async def language_selection(call: CallbackQuery, state: FSMContext):
 async def set_language(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         language = call.data.split("_")[1]
 
@@ -131,7 +132,7 @@ async def set_language(call: CallbackQuery, state: FSMContext):
 async def current_zone(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         data = await state.get_data()
         language = data["language"]
@@ -216,7 +217,7 @@ MAIN POSTING LOOP CALLBACK
 async def back(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         await state.update_data(looping=True)
 
@@ -256,7 +257,7 @@ async def back(call: CallbackQuery, state: FSMContext):
                     elif minutes == 0 and seconds == 0:
                         await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot")
 
-            if maintenance_status == "ON":
+            if maintenance_status == "ON" and call.from_user.id not in ADMINS:
                 await call.message.edit_text("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
                 await state.update_data(looping=False)
                 break
@@ -277,7 +278,7 @@ TERROR ZONE CHOICE CALLBACKS
 async def notifications(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         data = await state.get_data()
         language = data["language"]
@@ -292,7 +293,7 @@ async def notifications(call: CallbackQuery, state: FSMContext):
 async def zone_choice(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
-    if maintenance_status == "OFF":
+    if maintenance_status == "OFF" or call.from_user.id in ADMINS:
 
         data = await state.get_data()
         language = data["language"]
