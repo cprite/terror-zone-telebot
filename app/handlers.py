@@ -233,7 +233,7 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         await call.message.edit_text(language["main_loop"][0])
 
-        while looping and maintenance_status == "OFF":
+        while looping:
 
             current_time = time.localtime()
             minutes = current_time.tm_min
@@ -255,6 +255,11 @@ async def back(call: CallbackQuery, state: FSMContext):
                         await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
                     elif minutes == 0 and seconds == 0:
                         await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+
+            if maintenance_status == "ON":
+                await call.message.edit_text("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
+                await state.update_data(looping=False)
+                break
 
             data = await state.get_data()
             looping = data["looping"]
