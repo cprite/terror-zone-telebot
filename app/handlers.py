@@ -13,7 +13,7 @@ import app.keyboards as kb
 from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
-from app.database.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_stats
+from app.admin.stats.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_stats
 
 router = Router()
 
@@ -33,85 +33,120 @@ class GlobalVars(StatesGroup):
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext):
+    global maintenance_status
 
-    add_new_user(message.from_user.id)
+    if maintenance_status == "OFF":
 
-    await state.update_data(looping=False, zone_choice_list=[], language=ENGLISH)
+        add_new_user(message.from_user.id)
 
-    data = await state.get_data()
-    language = data["language"]
+        await state.update_data(looping=False, zone_choice_list=[], language=ENGLISH)
 
-    await message.answer(language["menu"][0],
-                        reply_markup=await kb.menu(language, message.from_user.id))
+        data = await state.get_data()
+        language = data["language"]
+
+        await message.answer(language["menu"][0],
+                            reply_markup=await kb.menu(language, message.from_user.id))
+
+    else: await message.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.message(Command("menu"))
 async def cmd_start(message: Message, state: FSMContext):
-    await state.update_data(looping=False)
-    data = await state.get_data()
-    language = data["language"]
-    zone_choice_list = data["zone_choice_list"]
-    zone_count = len(zone_choice_list)
+    global maintenance_status
 
-    switch_looping(message.from_user.id)
-    if zone_count == 0 or zone_count == 36:
-        switch_all_zones(message.from_user.id)
+    if maintenance_status == "OFF":
 
-    await message.answer(language["menu"][0],
-                        reply_markup=await kb.menu(language, message.from_user.id))
+        await state.update_data(looping=False)
+        data = await state.get_data()
+        language = data["language"]
+        zone_choice_list = data["zone_choice_list"]
+        zone_count = len(zone_choice_list)
+
+        switch_looping(message.from_user.id)
+        if zone_count == 0 or zone_count == 36:
+            switch_all_zones(message.from_user.id)
+
+        await message.answer(language["menu"][0],
+                            reply_markup=await kb.menu(language, message.from_user.id))
+
+    else: await message.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.callback_query(F.data == "menu")
 async def cmd_start(call: CallbackQuery, state: FSMContext):
-    await state.update_data(looping=False)
-    data = await state.get_data()
-    language = data["language"]
+    global maintenance_status
 
-    await call.message.edit_text(language["menu"][0],
-                        reply_markup=await kb.menu(language, call.from_user.id))
+    if maintenance_status == "OFF":
+
+        await state.update_data(looping=False)
+        data = await state.get_data()
+        language = data["language"]
+
+        await call.message.edit_text(language["menu"][0],
+                            reply_markup=await kb.menu(language, call.from_user.id))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.callback_query(F.data == "language")
 async def language_selection(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    language = data["language"]
+    global maintenance_status
 
-    await call.message.edit_text(language["menu"][7],
-                                reply_markup=await kb.language_choice(language))
+    if maintenance_status == "OFF":
+
+        data = await state.get_data()
+        language = data["language"]
+
+        await call.message.edit_text(language["menu"][7],
+                                    reply_markup=await kb.language_choice(language))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.callback_query(F.data.startswith("language_"))
 async def set_language(call: CallbackQuery, state: FSMContext):
-    language = call.data.split("_")[1]
+    global maintenance_status
 
-    if language == "ru":
-        await state.update_data(language=RUSSIAN)
-    elif language == "en":
-        await state.update_data(language=ENGLISH)
-    elif language == "uk":
-        await state.update_data(language=UKRAINIAN)
-    elif language == "zh":
-        await state.update_data(language=CHINESE)
-    elif language == "pt":
-        await state.update_data(language=PORTUGUESE)
-    elif language == "de":
-        await state.update_data(language=GERMAN)
+    if maintenance_status == "OFF":
 
-    data = await state.get_data()
+        language = call.data.split("_")[1]
 
-    await call.message.edit_text(data["language"]["menu"][0],
-                                reply_markup=await kb.menu(data["language"], call.from_user.id))
+        if language == "ru":
+            await state.update_data(language=RUSSIAN)
+        elif language == "en":
+            await state.update_data(language=ENGLISH)
+        elif language == "uk":
+            await state.update_data(language=UKRAINIAN)
+        elif language == "zh":
+            await state.update_data(language=CHINESE)
+        elif language == "pt":
+            await state.update_data(language=PORTUGUESE)
+        elif language == "de":
+            await state.update_data(language=GERMAN)
+
+        data = await state.get_data()
+
+        await call.message.edit_text(data["language"]["menu"][0],
+                                    reply_markup=await kb.menu(data["language"], call.from_user.id))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.callback_query(F.data == "current_zone")
 async def current_zone(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    language = data["language"]
+    global maintenance_status
 
-    current_parts = get_current_terror_zone()
+    if maintenance_status == "OFF":
 
-    current_zone = ""
+        data = await state.get_data()
+        language = data["language"]
 
-    for i in current_parts:
-        current_zone += "- " + i + "\n"
+        current_parts = get_current_terror_zone()
 
-    await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
-                                 reply_markup=await kb.back(language))
+        current_zone = ""
+
+        for i in current_parts:
+            current_zone += "- " + i + "\n"
+
+        await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
+                                    reply_markup=await kb.back(language))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 
 """
@@ -162,6 +197,16 @@ async def user_stats(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(f"Общее кол-во пользователей: {user_count}\n\nАктивная рассылка: {stats[0]}\n\nВыбраны все зоны: {stats[1]}",
                                  reply_markup=await kb.back(language))
 
+@router.callback_query(F.data == "tech_maintenance")
+async def maintenance_mode(call: CallbackQuery):
+    global maintenance_status
+
+    if maintenance_status == "OFF":
+        maintenance_status = "ON"
+    else:
+        maintenance_status = "OFF"
+
+    await call.message.edit_text("Панель админа", reply_markup=await kb.admin_panel(maintenance_status))
 
 
 """
@@ -169,48 +214,54 @@ MAIN POSTING LOOP CALLBACK
 """
 @router.callback_query(F.data == "start")
 async def back(call: CallbackQuery, state: FSMContext):
-    await state.update_data(looping=True)
+    global maintenance_status
 
-    data = await state.get_data()
+    if maintenance_status == "OFF":
 
-    zone_choice_list = data["zone_choice_list"]
-    zone_count = len(zone_choice_list)
-    language = data["language"]
-    looping = data["looping"]
-
-    switch_looping(call.from_user.id)
-    if zone_count == 0 or zone_count == 36:
-        switch_all_zones(call.from_user.id)
-
-    await call.message.edit_text(language["main_loop"][0])
-
-    while looping:
-
-        current_time = time.localtime()
-        minutes = current_time.tm_min
-        seconds = current_time.tm_sec
-
-        if minutes == 45 or minutes == 0:
-
-            next_parts = get_next_terror_zone()
-            next = " ".join(next_parts)
-
-            if next in zone_choice_list or not zone_choice_list:
-
-                next_zone = ""
-
-                for zone_b in next_parts:
-                    next_zone += "- " + zone_b + "\n"
-
-                if minutes == 45 and seconds == 0:
-                    await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
-                elif minutes == 0 and seconds == 0:
-                    await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+        await state.update_data(looping=True)
 
         data = await state.get_data()
+
+        zone_choice_list = data["zone_choice_list"]
+        zone_count = len(zone_choice_list)
+        language = data["language"]
         looping = data["looping"]
 
-        await asyncio.sleep(1)
+        switch_looping(call.from_user.id)
+        if zone_count == 0 or zone_count == 36:
+            switch_all_zones(call.from_user.id)
+
+        await call.message.edit_text(language["main_loop"][0])
+
+        while looping and maintenance_status == "OFF":
+
+            current_time = time.localtime()
+            minutes = current_time.tm_min
+            seconds = current_time.tm_sec
+
+            if minutes == 45 or minutes == 0:
+
+                next_parts = get_next_terror_zone()
+                next = " ".join(next_parts)
+
+                if next in zone_choice_list or not zone_choice_list:
+
+                    next_zone = ""
+
+                    for zone_b in next_parts:
+                        next_zone += "- " + zone_b + "\n"
+
+                    if minutes == 45 and seconds == 0:
+                        await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+                    elif minutes == 0 and seconds == 0:
+                        await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n\n" + "@terror_zone_bot")
+
+            data = await state.get_data()
+            looping = data["looping"]
+
+            await asyncio.sleep(1)
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 
 """
@@ -219,29 +270,41 @@ TERROR ZONE CHOICE CALLBACKS
 
 @router.callback_query(F.data == "terror_zone_choice")
 async def notifications(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    language = data["language"]
-    zone_choice_list = data["zone_choice_list"]
+    global maintenance_status
 
-    await call.message.edit_text(language["zone_choice"][0],
-                            reply_markup=await kb.zone_choice(language, zone_choice_list))
+    if maintenance_status == "OFF":
+
+        data = await state.get_data()
+        language = data["language"]
+        zone_choice_list = data["zone_choice_list"]
+
+        await call.message.edit_text(language["zone_choice"][0],
+                                reply_markup=await kb.zone_choice(language, zone_choice_list))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
 @router.callback_query(F.data.startswith("zone_"))
 async def zone_choice(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    language = data["language"]
-    zone_choice_list = data["zone_choice_list"]
+    global maintenance_status
 
-    terror_zone = ZONES[int(call.data.split("_")[1])].replace("🐮 ", "")
+    if maintenance_status == "OFF":
 
-    if terror_zone in zone_choice_list:
-        zone_choice_list.remove(terror_zone)
-    else:
-        zone_choice_list.append(terror_zone)
+        data = await state.get_data()
+        language = data["language"]
+        zone_choice_list = data["zone_choice_list"]
 
-    await state.update_data(zone_choice_list=zone_choice_list)
-    data = await state.get_data()
-    zone_choice_list = data["zone_choice_list"]
+        terror_zone = ZONES[int(call.data.split("_")[1])].replace("🐮 ", "")
 
-    await call.message.edit_text(language["zone_choice"][0],
-                            reply_markup=await kb.zone_choice(language, zone_choice_list))
+        if terror_zone in zone_choice_list:
+            zone_choice_list.remove(terror_zone)
+        else:
+            zone_choice_list.append(terror_zone)
+
+        await state.update_data(zone_choice_list=zone_choice_list)
+        data = await state.get_data()
+        zone_choice_list = data["zone_choice_list"]
+
+        await call.message.edit_text(language["zone_choice"][0],
+                                reply_markup=await kb.zone_choice(language, zone_choice_list))
+
+    else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
