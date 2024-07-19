@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-""" SIMPLE CSV DATABASE MANIPULATIONS FOR ANNOUNCMENTS """
+""" SIMPLE CSV DATABASE MANIPULATIONS """
 
 
 def add_new_user(id):
@@ -10,7 +10,9 @@ def add_new_user(id):
 
         df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
 
-        df = df._append(pd.DataFrame({"user": [id]}), ignore_index=True)
+        df = df._append(pd.DataFrame({"user": [id],
+                                      "looping": [0],
+                                      "all_zones": [0]}), ignore_index=True)
 
         df.to_csv(os.path.join("app/database/csv", "users.csv"), index=False)
 
@@ -23,3 +25,33 @@ def delete_user(id):
     df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
     df = df[df["user"] != id]
     df.to_csv(os.path.join("app/database/csv", "users.csv"), index=False)
+
+
+
+# SWITCHES FOR STATS DATA
+def switch_looping(id):
+    df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
+
+    if df.loc[df["user"] == id, "looping"].item() == 0:
+        df.loc[df["user"] == id, "looping"] = 1
+    else:
+        df.loc[df["user"] == id, "looping"] = 0
+
+    df.to_csv(os.path.join("app/database/csv", "users.csv"), index=False)
+
+
+def switch_all_zones(id):
+    df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
+
+    if df.loc[df["user"] == id, "all_zones"].item() == 0:
+        df.loc[df["user"] == id, "all_zones"] = 1
+    else:
+        df.loc[df["user"] == id, "all_zones"] = 0
+
+    df.to_csv(os.path.join("app/database/csv", "users.csv"), index=False)
+
+
+# STATS FOR PANEL
+def get_stats():
+    df = pd.read_csv(os.path.join("app/database/csv", "users.csv"))
+    return df["looping"].sum(), df["all_zones"].sum()
