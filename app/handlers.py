@@ -273,6 +273,9 @@ async def back(call: CallbackQuery, state: FSMContext):
 
         await call.message.edit_text(language["main_loop"][0])
 
+        if not get_all_zones(call.from_user.id):
+            await call.message.answer(get_advert())
+
         while looping:
 
             current_time = time.localtime()
