@@ -29,26 +29,30 @@ def delete_user(id):
 
 
 # SWITCHES FOR STATS DATA
-def switch_looping(id):
-    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
 
+def off_looping(id):
+    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
+    if df.loc[df["user"] == id, "looping"].item() == 1:
+        df.loc[df["user"] == id, "looping"] = 0
+        df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
+
+def on_looping(id):
+    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
     if df.loc[df["user"] == id, "looping"].item() == 0:
         df.loc[df["user"] == id, "looping"] = 1
-    else:
-        df.loc[df["user"] == id, "looping"] = 0
+        df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
 
-    df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
-
-
-def switch_all_zones(id):
+def off_all_zones(id):
     df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
+    if df.loc[df["user"] == id, "all_zones"].item() == 1:
+        df.loc[df["user"] == id, "all_zones"] = 0
+        df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
 
+def on_all_zones(id):
+    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
     if df.loc[df["user"] == id, "all_zones"].item() == 0:
         df.loc[df["user"] == id, "all_zones"] = 1
-    else:
-        df.loc[df["user"] == id, "all_zones"] = 0
-
-    df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
+        df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
 
 def get_looping(id):
     df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
