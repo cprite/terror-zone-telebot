@@ -50,6 +50,14 @@ def switch_all_zones(id):
 
     df.to_csv(os.path.join("app/admin/stats/csv", "users.csv"), index=False)
 
+def get_looping(id):
+    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
+    return df.loc[df["user"] == id, "looping"].item()
+
+def get_all_zones(id):
+    df = pd.read_csv(os.path.join("app/admin/stats/csv", "users.csv"))
+    return df.loc[df["user"] == id, "all_zones"].item()
+
 
 # STATS FOR PANEL
 def get_stats():

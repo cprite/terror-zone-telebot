@@ -14,7 +14,8 @@ from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
 from app.admin.admin_list import ADMINS
-from app.admin.stats.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_stats
+from app.admin.stats.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_looping, get_all_zones, get_stats
+from app.admin.commercial.adverts import set_advert, get_advert, advert_isActive
 
 router = Router()
 
@@ -31,6 +32,8 @@ class GlobalVars(StatesGroup):
     zone_choice_list = State()
     language = State()
     announcement = State()
+    ads_text = State()
+    ads_days = State()
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext):
@@ -167,7 +170,7 @@ async def set_announcement(call: CallbackQuery, state: FSMContext):
 
     await state.set_state(GlobalVars.announcement)
 
-    await call.message.edit_text("Введите объявление:", reply_markup=await kb.back(language))
+    await call.message.edit_text("Введите объявление:", reply_markup=await kb.back_admin())
 
 @router.message(GlobalVars.announcement)
 async def send_announcement(message: Message, state: FSMContext):
@@ -185,21 +188,19 @@ async def send_announcement(message: Message, state: FSMContext):
             delete_user(user)
 
     await message.answer(language["menu"][0],
-                                reply_markup=await kb.menu(language, message.from_user.id))
+                                reply_markup=await kb.back(language, message.from_user.id))
 
 @router.callback_query(F.data == "stats")
 async def user_stats(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    language = data["language"]
 
     user_count = len(get_users())
     stats = get_stats()
 
     await call.message.edit_text(f"Общее кол-во пользователей: {user_count}\n\nАктивная рассылка: {stats[0]}\n\nВыбраны все зоны: {stats[1]}",
-                                 reply_markup=await kb.back(language))
+                                 reply_markup=await kb.back_admin())
 
 @router.callback_query(F.data == "tech_maintenance")
-async def maintenance_mode(call: CallbackQuery):
+async def maintenance_mode(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
     if maintenance_status == "OFF":
@@ -209,6 +210,44 @@ async def maintenance_mode(call: CallbackQuery):
 
     await call.message.edit_text("Панель админа", reply_markup=await kb.admin_panel(maintenance_status))
 
+@router.callback_query(F.data == "ads")
+async def set_ads(call: CallbackQuery, state: FSMContext):
+    global maintenance_status
+
+    await state.set_state(GlobalVars.ads_text)
+
+    await call.message.edit_text("Введите текст рекламы:", reply_markup=await kb.back_admin())
+
+@router.message(GlobalVars.ads_text)
+async def send_ads(message: Message, state: FSMContext):
+
+    await state.update_data(ads_text=message.text)
+    await state.set_state(GlobalVars.ads_days)
+
+    await message.answer("Введите срок действия рекламы в днях:", reply_markup=await kb.back_admin())
+
+@router.message(GlobalVars.ads_days)
+async def send_ads(message: Message, state: FSMContext):
+
+    data = await state.get_data()
+    language = data["language"]
+    ads_text = data["ads_text"]
+
+    set_advert(ads_text, int(message.text))
+
+    users = get_users()
+
+    await message.answer("Реклама успешно установлена.")
+
+    for user in users:
+        try:
+            if not get_looping(user) or not get_all_zones(user):
+                await message.bot.send_message(user, ads_text)
+        except:
+            delete_user(user)
+
+    await message.answer(language["menu"][0],
+                                reply_markup=await kb.menu(language, message.from_user.id))
 
 """
 MAIN POSTING LOOP CALLBACK
@@ -253,9 +292,15 @@ async def back(call: CallbackQuery, state: FSMContext):
                         next_zone += "- " + zone_b + "\n"
 
                     if minutes == 45 and seconds == 0:
-                        await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot")
+                        if advert_isActive():
+                            await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------" + get_advert())
+                        else:
+                            await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot")
                     elif minutes == 0 and seconds == 0:
-                        await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot")
+                        if advert_isActive():
+                            await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------" + get_advert())
+                        else:
+                            await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot")
 
             if maintenance_status == "ON" and call.from_user.id not in ADMINS:
                 await call.message.edit_text("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")

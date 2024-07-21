@@ -28,6 +28,12 @@ async def back(language):
 
     return back_keyboard.as_markup()
 
+async def back_admin():
+    back_keyboard = InlineKeyboardBuilder()
+    back_keyboard.add(InlineKeyboardButton(text="Назад", callback_data="admin"))
+
+    return back_keyboard.as_markup()
+
 async def admin_panel(maintenance_status):
     admin_panel_keyboard = InlineKeyboardBuilder()
     admin_panel_keyboard.add(InlineKeyboardButton(text="Объявление", callback_data="announcement"))
