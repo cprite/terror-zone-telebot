@@ -16,8 +16,8 @@ def get_advert():
         ads = f.readlines()
 
         text = "\n".join(ads[:-2])
-        start_date = datetime.datetime.strptime(ads[-2], '%Y-%m-%d %H:%M:%S.%f')
-        end_date = datetime.datetime.strptime(ads[-1], '%Y-%m-%d %H:%M:%S.%f')
+        start_date = datetime.datetime.strptime(ads[-2].strip(), '%Y-%m-%d %H:%M:%S.%f')
+        end_date = datetime.datetime.strptime(ads[-1].strip(), '%Y-%m-%d %H:%M:%S.%f')
 
     if not text:
         return None

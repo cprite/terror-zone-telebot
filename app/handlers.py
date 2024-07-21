@@ -14,7 +14,7 @@ from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
 from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
 from app.admin.admin_list import ADMINS
-from app.admin.stats.csv.users import add_new_user, get_users, delete_user, switch_looping, switch_all_zones, get_looping, get_all_zones, get_stats
+from app.admin.stats.csv.users import add_new_user, get_users, delete_user, off_looping, on_looping, off_all_zones, on_all_zones, get_looping, get_all_zones, get_stats
 from app.admin.commercial.adverts import set_advert, get_advert, advert_isActive
 
 router = Router()
@@ -65,9 +65,9 @@ async def cmd_start(message: Message, state: FSMContext):
         zone_choice_list = data["zone_choice_list"]
         zone_count = len(zone_choice_list)
 
-        switch_looping(message.from_user.id)
+        off_looping(message.from_user.id)
         if zone_count == 0 or zone_count == 36:
-            switch_all_zones(message.from_user.id)
+            off_all_zones(message.from_user.id)
 
         await message.answer(language["menu"][0],
                             reply_markup=await kb.menu(language, message.from_user.id))
@@ -147,7 +147,8 @@ async def current_zone(call: CallbackQuery, state: FSMContext):
         for i in current_parts:
             current_zone += "- " + i + "\n"
 
-        await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone,
+        if advert_isActive():
+            await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone + "\n" + "@terror_zone_bot" + "\n-----------\n" + get_advert(),
                                     reply_markup=await kb.back(language))
 
     else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
@@ -267,9 +268,9 @@ async def back(call: CallbackQuery, state: FSMContext):
         language = data["language"]
         looping = data["looping"]
 
-        switch_looping(call.from_user.id)
+        on_looping(call.from_user.id)
         if zone_count == 0 or zone_count == 36:
-            switch_all_zones(call.from_user.id)
+            on_all_zones(call.from_user.id)
 
         await call.message.edit_text(language["main_loop"][0])
 
@@ -296,12 +297,12 @@ async def back(call: CallbackQuery, state: FSMContext):
 
                     if minutes == 45 and seconds == 0:
                         if advert_isActive():
-                            await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------" + get_advert())
+                            await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------\n" + get_advert())
                         else:
                             await call.message.answer(language["main_loop"][1] + "\n" + next_zone + "\n" + "@terror_zone_bot")
                     elif minutes == 0 and seconds == 0:
                         if advert_isActive():
-                            await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------" + get_advert())
+                            await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot" + "\n-----------\n" + get_advert())
                         else:
                             await call.message.answer(language["main_loop"][2] + "\n" + next_zone + "\n" + "@terror_zone_bot")
 
