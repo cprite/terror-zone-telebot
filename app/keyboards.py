@@ -28,6 +28,23 @@ async def back(language):
 
     return back_keyboard.as_markup()
 
+async def language_choice(language):
+    language_keyboard = InlineKeyboardBuilder()
+    language_keyboard.add(InlineKeyboardButton(text="🇷🇺", callback_data="language_ru"))
+    language_keyboard.add(InlineKeyboardButton(text="🇬🇧", callback_data="language_en"))
+    language_keyboard.add(InlineKeyboardButton(text="🇺🇦", callback_data="language_uk"))
+    language_keyboard.add(InlineKeyboardButton(text="🇨🇳", callback_data="language_zh"))
+    language_keyboard.add(InlineKeyboardButton(text="🇧🇷", callback_data="language_pt"))
+    language_keyboard.add(InlineKeyboardButton(text="🇩🇪", callback_data="language_de"))
+
+    language_keyboard.add(InlineKeyboardButton(text=language['menu'][6], callback_data="menu"))
+
+    return language_keyboard.adjust(2).as_markup()
+
+
+"""
+ADMIN PANELS KEYBOARDS
+"""
 async def back_admin():
     back_keyboard = InlineKeyboardBuilder()
     back_keyboard.add(InlineKeyboardButton(text="Назад", callback_data="admin"))
@@ -44,18 +61,18 @@ async def admin_panel(maintenance_status):
 
     return admin_panel_keyboard.adjust(2).as_markup()
 
-async def language_choice(language):
-    language_keyboard = InlineKeyboardBuilder()
-    language_keyboard.add(InlineKeyboardButton(text="🇷🇺", callback_data="language_ru"))
-    language_keyboard.add(InlineKeyboardButton(text="🇬🇧", callback_data="language_en"))
-    language_keyboard.add(InlineKeyboardButton(text="🇺🇦", callback_data="language_uk"))
-    language_keyboard.add(InlineKeyboardButton(text="🇨🇳", callback_data="language_zh"))
-    language_keyboard.add(InlineKeyboardButton(text="🇧🇷", callback_data="language_pt"))
-    language_keyboard.add(InlineKeyboardButton(text="🇩🇪", callback_data="language_de"))
+async def ads_panel(ads_status):
+    adjust = 1
+    ads_panel_keyboard = InlineKeyboardBuilder()
+    ads_panel_keyboard.add(InlineKeyboardButton(text=f"Добавить новую", callback_data="ads_add"))
 
-    language_keyboard.add(InlineKeyboardButton(text=language['menu'][6], callback_data="menu"))
+    if ads_status:
+        ads_panel_keyboard.add(InlineKeyboardButton(text=f"Удалить текущую", callback_data="ads_delete"))
+        adjust = 2
 
-    return language_keyboard.adjust(2).as_markup()
+    ads_panel_keyboard.add(InlineKeyboardButton(text=f"Назад", callback_data="admin"))
+
+    return ads_panel_keyboard.adjust(adjust).as_markup()
 
 
 """

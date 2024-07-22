@@ -12,12 +12,15 @@ def set_advert(text, days):
 
 
 def get_advert():
-    with open(os.path.join("app/admin/commercial", "ads.txt"), 'r') as f:
-        ads = f.readlines()
+    try:
+        with open(os.path.join("app/admin/commercial", "ads.txt"), 'r') as f:
+            ads = f.readlines()
 
-        text = "\n".join(ads[:-2])
-        start_date = datetime.datetime.strptime(ads[-2].strip(), '%Y-%m-%d %H:%M:%S.%f')
-        end_date = datetime.datetime.strptime(ads[-1].strip(), '%Y-%m-%d %H:%M:%S.%f')
+            text = "\n".join(ads[:-2])
+            start_date = datetime.datetime.strptime(ads[-2].strip(), '%Y-%m-%d %H:%M:%S.%f')
+            end_date = datetime.datetime.strptime(ads[-1].strip(), '%Y-%m-%d %H:%M:%S.%f')
+    except:
+        return None
 
     if not text:
         return None
@@ -30,6 +33,11 @@ def get_advert():
         with open(os.path.join("app/admin/commercial", "ads.txt"), 'w') as f:
             f.write('')
         return None
+
+
+def delete_advert():
+    with open(os.path.join("app/admin/commercial", "ads.txt"), 'w') as f:
+        f.write('')
 
 
 def advert_isActive():
