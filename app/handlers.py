@@ -15,7 +15,7 @@ from app.src.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
 from app.admin.admin_list import ADMINS
 from app.admin.stats.csv.users import add_new_user, get_users, delete_user, off_looping, on_looping, off_all_zones, on_all_zones, get_looping, get_all_zones, get_stats
-from app.admin.commercial.adverts import set_advert, get_advert, advert_isActive
+from app.admin.commercial.adverts import set_advert, get_advert, delete_advert, advert_isActive
 
 router = Router()
 
@@ -213,6 +213,18 @@ async def maintenance_mode(call: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "ads")
 async def set_ads(call: CallbackQuery, state: FSMContext):
+
+    await call.message.edit_text("Выберите действие", reply_markup=await kb.ads_panel(advert_isActive()))
+
+@router.callback_query(F.data == "ads_delete")
+async def delete_ads(call: CallbackQuery):
+    delete_advert()
+
+    await call.message.edit_text("Реклама успешно удалена.")
+    await call.message.answer("Выберите действие", reply_markup=await kb.ads_panel(advert_isActive()))
+
+@router.callback_query(F.data == "ads_add")
+async def set_ads(call: CallbackQuery, state: FSMContext):
     global maintenance_status
 
     await state.set_state(GlobalVars.ads_text)
@@ -229,9 +241,9 @@ async def send_ads(message: Message, state: FSMContext):
 
 @router.message(GlobalVars.ads_days)
 async def send_ads(message: Message, state: FSMContext):
+    global maintenance_status
 
     data = await state.get_data()
-    language = data["language"]
     ads_text = data["ads_text"]
 
     set_advert(ads_text, int(message.text))
@@ -247,8 +259,7 @@ async def send_ads(message: Message, state: FSMContext):
         except:
             delete_user(user)
 
-    await message.answer(language["menu"][0],
-                                reply_markup=await kb.menu(language, message.from_user.id))
+    await message.answer("Панель админа", reply_markup=await kb.admin_panel(maintenance_status))
 
 """
 MAIN POSTING LOOP CALLBACK
