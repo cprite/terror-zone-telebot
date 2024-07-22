@@ -150,6 +150,9 @@ async def current_zone(call: CallbackQuery, state: FSMContext):
         if advert_isActive():
             await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone + "\n" + "@terror_zone_bot" + "\n-----------\n" + get_advert(),
                                     reply_markup=await kb.back(language))
+        else:
+            await call.message.edit_text(language["menu"][5] + "\n\n" + current_zone + "\n" + "@terror_zone_bot",
+                                    reply_markup=await kb.back(language))
 
     else: await call.answer("Бот находится на техническом обслуживании. Пожалуйста, попробуйте позже.")
 
