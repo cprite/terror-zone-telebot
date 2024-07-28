@@ -10,8 +10,8 @@ import time
 
 import app.keyboards as kb
 
-from app.src.zone_info import get_next_terror_zone, get_current_terror_zone
-from app.src.zones import ZONES
+from app.src.zone.zone_info import get_next_terror_zone, get_current_terror_zone
+from app.src.zone.zones import ZONES
 from app.ui.language import RUSSIAN, ENGLISH, UKRAINIAN, CHINESE, PORTUGUESE, GERMAN
 from app.admin.admin_list import ADMINS
 from app.admin.stats.csv.users import add_new_user, get_users, delete_user, off_looping, on_looping, off_all_zones, on_all_zones, get_looping, get_all_zones, get_stats
