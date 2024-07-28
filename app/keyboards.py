@@ -3,7 +3,7 @@ from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
-from app.src.zones import ZONES
+from app.src.zone.zones import ZONES
 from app.admin.admin_list import ADMINS
 
 
