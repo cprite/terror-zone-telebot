@@ -8,7 +8,7 @@ def ping():
 
         try:
 
-            url = os.getenv('URL')
+            url = os.getenv('TELEBOT_URL')
             response = requests.get(url)
             print(f"Server status: {response.status_code}")
 
