@@ -6,6 +6,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 
+# webdriver-manager==4.0.1
+
 """"""
 
 def terror_zone_loop():
