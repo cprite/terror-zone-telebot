@@ -31,7 +31,7 @@ def terror_zone_loop():
 
             page_source = driver.page_source
 
-            driver.close()
+            driver.quit()  # Use quit() instead of close()
 
             soup = BeautifulSoup(page_source, 'html.parser')
 
