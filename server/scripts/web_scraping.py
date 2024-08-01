@@ -14,58 +14,64 @@ def terror_zone_loop():
 
     while True:
 
-        current_time = time.localtime()
+        try:
 
-        if current_time.tm_min == 5 or first_run:
+            current_time = time.localtime()
 
-            chrome_options = webdriver.ChromeOptions()
-            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-            chrome_options.add_argument("start-maximized")
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--no-sandbox")
+            if current_time.tm_min == 5 or first_run:
 
-            # service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+                chrome_options = webdriver.ChromeOptions()
+                chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+                chrome_options.add_argument("start-maximized")
+                chrome_options.add_argument("--headless")
+                chrome_options.add_argument("--disable-dev-shm-usage")
+                chrome_options.add_argument("--no-sandbox")
 
-            # driver = webdriver.Chrome(service=service, options=chrome_options)
-            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+                # service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
 
-            driver.get("https://www.d2emu.com/tz")
+                # driver = webdriver.Chrome(service=service, options=chrome_options)
+                driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-            page_source = driver.page_source
+                driver.get("https://www.d2emu.com/tz")
 
-            driver.close()
+                page_source = driver.page_source
 
-            soup = BeautifulSoup(page_source, 'html.parser')
+                driver.close()
 
-            span = soup.find_all("span", {"class": "terrorzone darkmode-ignore"})
+                soup = BeautifulSoup(page_source, 'html.parser')
 
-            current = span[0]
-            next = span[1]
+                span = soup.find_all("span", {"class": "terrorzone darkmode-ignore"})
 
-            # Extract the raw HTML content inside the span
-            raw_html_current = current.decode_contents()
-            raw_html_next = next.decode_contents()
+                current = span[0]
+                next = span[1]
 
-            # Split the content by <br/> tags
-            zone_parts_current = raw_html_current.split('<br/>')
-            zone_parts_next = raw_html_next.split('<br/>')
+                # Extract the raw HTML content inside the span
+                raw_html_current = current.decode_contents()
+                raw_html_next = next.decode_contents()
 
-            # Remove any surrounding whitespace
-            zone_parts_current = [text.strip() for text in zone_parts_current]
-            zone_parts_next = [text.strip() for text in zone_parts_next]
+                # Split the content by <br/> tags
+                zone_parts_current = raw_html_current.split('<br/>')
+                zone_parts_next = raw_html_next.split('<br/>')
 
-            with open(os.path.join("server/data", "next_zone.txt"), "w") as file:
-                for part in zone_parts_next:
-                    file.write(part + "\n")
+                # Remove any surrounding whitespace
+                zone_parts_current = [text.strip() for text in zone_parts_current]
+                zone_parts_next = [text.strip() for text in zone_parts_next]
 
-            with open(os.path.join("server/data", "current_zone.txt"), "w") as file:
-                for part in zone_parts_current:
-                    file.write(part + "\n")
+                with open(os.path.join("server/data", "next_zone.txt"), "w") as file:
+                    for part in zone_parts_next:
+                        file.write(part + "\n")
 
-            print("Zone updated")
+                with open(os.path.join("server/data", "current_zone.txt"), "w") as file:
+                    for part in zone_parts_current:
+                        file.write(part + "\n")
 
-            first_run = False
+                print("Zone updated")
+
+                first_run = False
+
+        except Exception as e:
+            print(e)
+            print("Error updating terror zone, trying again in 60 seconds")
 
         time.sleep(60)
 
