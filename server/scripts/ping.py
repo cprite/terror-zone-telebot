@@ -15,7 +15,7 @@ def ping():
         except Exception as e:
             print(f"Error: {e}")
 
-        time.sleep(60)
+        time.sleep(1800)
 
 
 if __name__ == "__main__":
