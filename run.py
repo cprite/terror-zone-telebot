@@ -14,7 +14,7 @@ dp = Dispatcher()
 
 async def main():
     dp.include_router(router)
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, polling_timeout = 900)
 
 
 if __name__ == "__main__":
