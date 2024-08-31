@@ -14,8 +14,8 @@ RUSSIAN = {
                     "Готово"],
 
     "main_loop": ["В процессе...",
-                  "!!!ВНИМАНИЕ!!!\n\nЧерез 15 мин начинается:",
-                  "!!!ВПЕРЕД!!!\n\nНачинается зона:"],
+                  "Воины Санктуария,\n\nТолчки сбавляют интенсивность. 15 минут до зоны ужаса:",
+                  "Воины Санктуария,\n\nТлетворные толчки снова бушуют! Их цель:"],
 }
 
 ENGLISH = {
@@ -34,8 +34,8 @@ ENGLISH = {
                     "Done"],
 
     "main_loop": ["In progress...",
-                  "!!!ATTENTION!!!\n\nIn 15 minutes starts:",
-                  "!!!LET'S GO!!!\n\nZone starts:"],
+                  "Warriors of Sanctuary,\n\nThe corruption begins to fade. 15 minutes until next terror zone:",
+                  "Warriors of Sanctuary,\n\nCorrupted tremors strike:"],
 }
 
 UKRAINIAN = {
@@ -54,8 +54,8 @@ UKRAINIAN = {
                     "Готово"],
 
     "main_loop": ["В процесі...",
-                  "!!!УВАГА!!!\n\nЧерез 15 хв починається:",
-                  "!!!ВПЕРЕД!!!\n\nПочинається зона:"],
+                  "Воїни Святилища,\n\nТолчки зменшують інтенсивність. 15 хвилин до зони жаху:",
+                  "Воїни Святилища,\n\nТлетворні толчки знову бушують! Їх ціль:"],
 }
 
 CHINESE = {
@@ -74,8 +74,8 @@ CHINESE = {
                     "完成"],
 
     "main_loop": ["进行中...",
-                  "!!!注意!!!\n\n15分钟后开始:",
-                  "!!!开始!!!\n\n区域开始:"],
+                  "圣域战士们,\n\n腐化开始消退。距离下一个恐怖区域还有15分钟:",
+                  "圣域战士们,\n\n腐化震颤再次袭来:"],
 }
 
 PORTUGUESE = {
@@ -94,8 +94,8 @@ PORTUGUESE = {
                     "Feito"],
 
     "main_loop": ["Em andamento...",
-                  "!!!ATENÇÃO!!!\n\nEm 15 minutos começa:",
-                  "!!!VAMOS LÁ!!!\n\nZona começa:"],
+                  "Guerreiros do Santuário,\n\nA corrupção começa a desaparecer. 15 minutos até a próxima zona de terror:",
+                  "Guerreiros do Santuário,\n\nTremores corrompidos atacam:"],
 }
 
 GERMAN = {
@@ -114,6 +114,6 @@ GERMAN = {
                     "Fertig"],
 
     "main_loop": ["In Bearbeitung...",
-                  "!!!ACHTUNG!!!\n\nIn 15 Minuten beginnt:",
-                  "!!!LOS GEHT'S!!!\n\nZone beginnt:"],
+                  "Krieger des Heiligtums,\n\nDie Korruption beginnt zu verblassen. 15 Minuten bis zur nächsten Terrorzone:",
+                  "Krieger des Heiligtums,\n\nKorrupte Erschütterungen schlagen zu:"],
 }
