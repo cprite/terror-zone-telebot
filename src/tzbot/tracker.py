@@ -29,6 +29,11 @@ from tzbot.storage import Storage
 
 log = logging.getLogger(__name__)
 
+# A glyph in front of the zone name gives the push notification something to
+# catch the eye, and separates the two kinds of alert before a word is read:
+# the countdown vs the zone that just went live.
+ALERT_ICON = {"prealert": "\N{HOURGLASS WITH FLOWING SAND}", "rotation": "\N{FIRE}"}
+
 
 class Broadcaster:
     """Sends one message to many chats without tripping Telegram's rate limit."""
@@ -180,7 +185,9 @@ class Tracker:
             # only shows the opening lines, so anything below line two is
             # invisible until the chat is opened - which is where the zone
             # used to sit, under three lines of flavour text.
-            body = f"{label}\n{t(subscriber.language, f'{key}_head')}"
+            icon = ALERT_ICON.get(key, "")
+            headline = f"{icon} {label}".strip()
+            body = f"{headline}\n{t(subscriber.language, f'{key}_head')}"
             flavour = t(subscriber.language, key)
             if flavour:
                 body = f"{body}\n\n{flavour}"
