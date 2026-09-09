@@ -200,3 +200,37 @@ async def test_unrecognised_zone_is_still_relayed(storage, broadcaster):
     await tracker.tick(at(13, 1))
 
     assert "Brand New Zone" in broadcaster.batches[0][1]
+
+
+async def test_zone_name_is_the_first_line(storage, broadcaster):
+    """Telegram's notification preview cuts everything after the opening lines.
+
+    The zone used to sit on line five, under the flavour text, so a push
+    notification showed the greeting and hid the one fact that matters.
+    """
+    await subscribe(storage, 1, language="ru")
+    provider = FakeProvider(snap(TRAVINCAL, DURANCE), snap(DURANCE, TRISTRAM))
+    tracker = build(provider, storage, broadcaster)
+
+    await tracker.tick(at(12, 10))
+    await tracker.tick(at(13, 1))          # rotation
+    await tracker.tick(at(13, 46))         # prealert
+
+    for batch in broadcaster.batches:
+        first, second, *_ = batch[1].splitlines()
+        assert first in (DURANCE, TRISTRAM), f"line 1 was {first!r}"
+        assert second.strip(), "line 2 must carry the status, not be blank"
+
+
+async def test_advert_does_not_push_the_zone_down(storage, broadcaster):
+    await subscribe(storage, 1)
+    await storage.set_advert("buy runes", days=1)
+    provider = FakeProvider(snap(TRAVINCAL, DURANCE), snap(DURANCE, TRISTRAM))
+    tracker = build(provider, storage, broadcaster)
+
+    await tracker.tick(at(12, 10))
+    await tracker.tick(at(13, 1))
+
+    body = broadcaster.batches[0][1]
+    assert body.splitlines()[0] == DURANCE
+    assert body.endswith("buy runes")
