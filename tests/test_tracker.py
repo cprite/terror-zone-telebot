@@ -7,7 +7,7 @@ import datetime as dt
 import pytest
 
 from tzbot.providers.base import ProviderError, Snapshot
-from tzbot.tracker import Tracker
+from tzbot.tracker import ALERT_ICON, Tracker
 
 DURANCE = "Durance of Hate"
 TRAVINCAL = "Travincal"
@@ -216,10 +216,29 @@ async def test_zone_name_is_the_first_line(storage, broadcaster):
     await tracker.tick(at(13, 1))          # rotation
     await tracker.tick(at(13, 46))         # prealert
 
+    icons = set(ALERT_ICON.values())
     for batch in broadcaster.batches:
         first, second, *_ = batch[1].splitlines()
-        assert first in (DURANCE, TRISTRAM), f"line 1 was {first!r}"
+        icon, _, zone = first.partition(" ")
+        assert icon in icons, f"line 1 must open with an alert icon, got {first!r}"
+        assert zone in (DURANCE, TRISTRAM), f"line 1 zone was {zone!r}"
         assert second.strip(), "line 2 must carry the status, not be blank"
+
+
+async def test_the_two_alerts_use_different_icons(storage, broadcaster):
+    """At a glance the icon says "starts soon" or "live now"."""
+    await subscribe(storage, 1)
+    provider = FakeProvider(snap(TRAVINCAL, DURANCE), snap(DURANCE, TRISTRAM))
+    tracker = build(provider, storage, broadcaster)
+
+    await tracker.tick(at(12, 10))
+    await tracker.tick(at(13, 1))          # rotation
+    await tracker.tick(at(13, 46))         # prealert
+
+    rotation, prealert = (b[1].split(" ", 1)[0] for b in broadcaster.batches)
+    assert rotation == ALERT_ICON["rotation"]
+    assert prealert == ALERT_ICON["prealert"]
+    assert rotation != prealert
 
 
 async def test_advert_does_not_push_the_zone_down(storage, broadcaster):
@@ -232,5 +251,5 @@ async def test_advert_does_not_push_the_zone_down(storage, broadcaster):
     await tracker.tick(at(13, 1))
 
     body = broadcaster.batches[0][1]
-    assert body.splitlines()[0] == DURANCE
+    assert body.splitlines()[0] == f"{ALERT_ICON['rotation']} {DURANCE}"
     assert body.endswith("buy runes")
