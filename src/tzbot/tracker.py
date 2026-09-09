@@ -176,7 +176,14 @@ class Tracker:
         for subscriber in await self._storage.subscribers():
             if not subscriber.wants(zone_id):
                 continue
-            body = f"{t(subscriber.language, key)}\n\n- {label}"
+            # Zone name first, status second. Telegram's notification preview
+            # only shows the opening lines, so anything below line two is
+            # invisible until the chat is opened - which is where the zone
+            # used to sit, under three lines of flavour text.
+            body = f"{label}\n{t(subscriber.language, f'{key}_head')}"
+            flavour = t(subscriber.language, key)
+            if flavour:
+                body = f"{body}\n\n{flavour}"
             if advert:
                 body = f"{body}\n\n-----------\n{advert}"
             messages[subscriber.user_id] = body
